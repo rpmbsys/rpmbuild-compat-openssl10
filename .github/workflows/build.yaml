@@ -26,11 +26,12 @@ jobs:
       BINTRAY_REPO: ${{ matrix.repo }}
       BUILD: ${{ matrix.build }}
       UPLOADER: ${{ matrix.uploader }}
+      REPO_PATH: ${{ matrix.repo_path }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - run: docker compose -f $BUILD_COMPOSE_FILE build --no-cache $BUILD
       - run: docker compose -f $BUILD_COMPOSE_FILE up --exit-code-from $BUILD $BUILD
       - run: docker compose -f rpmbuild/docker-compose.yml pull $UPLOADER
-      - run: docker compose -f rpmbuild/docker-compose.yml run --rm -e BINTRAY_USER=$BINTRAY_USER -e BINTRAY_API_KEY=$BINTRAY_API_KEY -e BINTRAY_REPO=$BINTRAY_REPO -e ARTIFACTORY_URL=$ARTIFACTORY_URL $UPLOADER
+      - run: docker compose -f rpmbuild/docker-compose.yml run --rm -e BINTRAY_USER=$BINTRAY_USER -e BINTRAY_API_KEY=$BINTRAY_API_KEY -e BINTRAY_REPO=$BINTRAY_REPO -e ARTIFACTORY_URL=$ARTIFACTORY_URL -e REPO_PATH=$REPO_PATH $UPLOADER
