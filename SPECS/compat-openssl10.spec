@@ -315,7 +315,6 @@ done
 patch -p1 -R < %{PATCH33}
 cp apps/openssl.cnf apps/openssl10.cnf
 
-update-crypto-policies --set LEGACY
 LD_LIBRARY_PATH=`pwd`${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 export LD_LIBRARY_PATH
 OPENSSL_ENABLE_MD5_VERIFY=
