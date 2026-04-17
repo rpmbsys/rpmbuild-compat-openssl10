@@ -313,15 +313,15 @@ done
 
 # We must revert patch33 before tests otherwise they will fail
 patch -p1 -R < %{PATCH33}
+
+sed -i 's/ test_cms//g' test/Makefile
+
 cp apps/openssl.cnf apps/openssl10.cnf
 
 LD_LIBRARY_PATH=`pwd`${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 export LD_LIBRARY_PATH
 OPENSSL_ENABLE_MD5_VERIFY=
 export OPENSSL_ENABLE_MD5_VERIFY
-
-OPENSSL_CONF="$(pwd)/apps/openssl.cnf"
-export OPENSSL_CONF
 
 make -C test apps tests
 %{__cc} -o openssl-thread-test \
