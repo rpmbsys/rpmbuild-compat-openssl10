@@ -9,6 +9,7 @@ RUN dnf -y install \
         perl-File-Find-Rule "perl(File::Compare)" \
         /usr/bin/rename /usr/bin/pod2man /usr/bin/cmp \
         "perl(FileHandle)" \
+        crypto-policies-scripts \
     && dnf clean all && rm -rf /var/cache/dnf
 
 COPY SOURCES ${BUILD_TOPDIR}/SOURCES
