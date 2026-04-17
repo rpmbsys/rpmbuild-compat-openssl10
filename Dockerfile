@@ -4,7 +4,7 @@ FROM aursu/rpmbuild:${os}-build
 USER root
 RUN dnf -y install \
         gcc \
-        coreutils perl-interpreter perl-generators sed zlib-devel \
+        perl-interpreter perl-generators sed zlib-devel \
         lksctp-tools-devel \
         perl-File-Find-Rule "perl(File::Compare)" \
         /usr/bin/rename /usr/bin/pod2man /usr/bin/cmp \
