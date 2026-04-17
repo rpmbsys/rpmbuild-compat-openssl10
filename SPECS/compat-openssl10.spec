@@ -319,6 +319,10 @@ LD_LIBRARY_PATH=`pwd`${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 export LD_LIBRARY_PATH
 OPENSSL_ENABLE_MD5_VERIFY=
 export OPENSSL_ENABLE_MD5_VERIFY
+
+OPENSSL_CONF="$(pwd)/apps/openssl.cnf"
+export OPENSSL_CONF
+
 make -C test apps tests
 %{__cc} -o openssl-thread-test \
     -I./include \
