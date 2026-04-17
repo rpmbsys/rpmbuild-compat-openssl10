@@ -103,11 +103,11 @@ License: OpenSSL
 URL: http://www.openssl.org/
 BuildRequires: gcc
 BuildRequires: coreutils, perl-interpreter, perl-generators, sed, zlib-devel, /usr/bin/cmp
-BuildRequires: perl-File-Find-Rule, perl-File-Compare
+BuildRequires: perl-File-Find-Rule, perl(File::Compare)
 BuildRequires: lksctp-tools-devel
 BuildRequires: /usr/bin/rename
 BuildRequires: /usr/bin/pod2man
-BuildRequires: perl-FileHandle
+BuildRequires: perl(FileHandle)
 Requires: coreutils, make
 Requires: crypto-policies
 Conflicts: openssl < 1:1.1.0, openssl-libs < 1:1.1.0

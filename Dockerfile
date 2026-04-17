@@ -6,9 +6,9 @@ RUN dnf -y install \
         gcc \
         coreutils perl-interpreter perl-generators sed zlib-devel \
         lksctp-tools-devel \
-        perl-File-Find-Rule perl-File-Compare \
+        perl-File-Find-Rule "perl(File::Compare)" \
         /usr/bin/rename /usr/bin/pod2man /usr/bin/cmp \
-        perl-FileHandle \
+        "perl(FileHandle)" \
     && dnf clean all && rm -rf /var/cache/dnf
 
 COPY SOURCES ${BUILD_TOPDIR}/SOURCES
