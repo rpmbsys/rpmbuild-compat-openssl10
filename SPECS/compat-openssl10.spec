@@ -359,18 +359,8 @@ done
 # Delete static library
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.a || :
 
-# Rename man pages so that they don't conflict with other system man pages.
-pushd $RPM_BUILD_ROOT%{_mandir}
-for manpage in man*/* ; do
-	if [ -L ${manpage} ]; then
-		TARGET=`ls -l ${manpage} | awk '{ print $NF }'`
-		ln -snf ${TARGET}ssl ${manpage}ssl
-		rm -f ${manpage}
-	else
-		mv ${manpage} ${manpage}ssl
-	fi
-done
-popd
+# Remove misc scripts
+rm -rf $RPM_BUILD_ROOT%{_openssldir}/misc
 
 # Delete non-devel man pages in the compat package
 rm -rf $RPM_BUILD_ROOT%{_mandir}/man[157]*
