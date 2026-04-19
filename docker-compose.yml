@@ -1,13 +1,10 @@
 services:
   rocky8build:
     volumes:
-      - rpms:/home/centos/rpmbuild/SRPMS
       - rpm8rocky:/home/centos/rpmbuild/RPMS
     build:
       context: .
 
 volumes:
-  rpms:
-    name: rpms
   rpm8rocky:
     name: rpm8rocky

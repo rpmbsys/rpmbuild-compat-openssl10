@@ -9,14 +9,12 @@ RUN dnf -y install \
         perl-File-Find-Rule "perl(File::Compare)" \
         /usr/bin/rename /usr/bin/pod2man /usr/bin/cmp \
         "perl(FileHandle)" \
-        crypto-policies-scripts \
     && dnf clean all && rm -rf /var/cache/dnf
 
 COPY SOURCES ${BUILD_TOPDIR}/SOURCES
 COPY SPECS ${BUILD_TOPDIR}/SPECS
 
 RUN chown -R $BUILD_USER ${BUILD_TOPDIR}/{SOURCES,SPECS}
-RUN update-crypto-policies --set LEGACY
 
 USER $BUILD_USER
 ENTRYPOINT ["/usr/bin/rpmbuild", "compat-openssl10.spec"]

@@ -346,11 +346,11 @@ make -C test apps tests
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir},%{_libdir}/openssl}
 make INSTALL_PREFIX=$RPM_BUILD_ROOT LIBDIR=%{_lib} install
 make INSTALL_PREFIX=$RPM_BUILD_ROOT LIBDIR=%{_lib} install_docs
+mv $RPM_BUILD_ROOT%{_libdir}/engines $RPM_BUILD_ROOT%{_libdir}/openssl
 mv $RPM_BUILD_ROOT%{_openssldir}/man/* $RPM_BUILD_ROOT%{_mandir}/
 rmdir $RPM_BUILD_ROOT%{_openssldir}/man
-# SHLIB_VERSION_NUMBER is patched to %{version}, so make install already
-# creates libssl.so.%{version} and libcrypto.so.%{version} as real files.
-# We only need to add the soversion symlinks.
+
+rename so.%{soversion} so.%{version} $RPM_BUILD_ROOT%{_libdir}/*.so.%{soversion}
 for lib in $RPM_BUILD_ROOT%{_libdir}/*.so.%{version} ; do
     chmod 755 ${lib}
     ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_libdir}/`basename ${lib} .%{version}`.%{soversion}
