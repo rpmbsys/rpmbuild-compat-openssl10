@@ -14,6 +14,9 @@
 # Number of threads to spawn when testing some threading fixes.
 %global thread_test_threads %{?threads:%{threads}}%{!?threads:1}
 
+%define _prefix /usr/local/openssl10
+%define _openssldir %{_sysconfdir}/pki/tls
+
 # Arches on which we need to prevent arch conflicts on opensslconf.h, must
 # also be handled in opensslconf-new.h.
 %global multilib_arches %{ix86} ia64 %{mips} ppc %{power64} s390 s390x sparcv9 sparc64 x86_64
@@ -23,7 +26,7 @@
 Summary: Compatibility version of the OpenSSL library
 Name: compat-openssl10
 Version: 1.0.2o
-Release: 11%{?dist}
+Release: 12%{?dist}
 Epoch: 1
 # We have to remove certain patented algorithms from the openssl source
 # tarball with the hobble-openssl script which is included below.
@@ -110,7 +113,6 @@ BuildRequires: /usr/bin/pod2man
 BuildRequires: perl(FileHandle)
 Requires: coreutils, make
 Requires: crypto-policies
-Conflicts: openssl < 1:1.1.0, openssl-libs < 1:1.1.0
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -124,11 +126,6 @@ Summary: Files for development of applications which have to use OpenSSL-1.0.2
 Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 Requires: zlib-devel%{?_isa}
 Requires: pkgconfig
-# The devel subpackage intentionally conflicts with main openssl-devel
-# as simultaneous use of both openssl package cannot be encouraged.
-# Making the packages non-conflicting would also require further
-# changes in the dependent packages.
-Conflicts: openssl-devel
 
 %description devel
 The OpenSSL toolkit provides support for secure communications between
@@ -392,6 +389,10 @@ rm -rf $RPM_BUILD_ROOT/%{_libdir}/openssl
 # Install compat config file
 install -m 644 apps/openssl10.cnf $RPM_BUILD_ROOT%{_sysconfdir}/pki/openssl10.cnf
 
+# Install ld.so.conf.d config so ldconfig can find our libs
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d
+echo %{_libdir} > $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d/%{name}-%{_arch}.conf
+
 %files
 %license LICENSE
 %doc FAQ NEWS README
@@ -404,8 +405,7 @@ install -m 644 apps/openssl10.cnf $RPM_BUILD_ROOT%{_sysconfdir}/pki/openssl10.cn
 %attr(0755,root,root) %{_libdir}/libssl.so.%{soversion}
 %attr(0644,root,root) %{_libdir}/.libcrypto.so.*.hmac
 %attr(0644,root,root) %{_libdir}/.libssl.so.*.hmac
-
-%dir %{_sysconfdir}/pki
+%attr(0644,root,root) %{_sysconfdir}/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(0644,root,root) %{_sysconfdir}/pki/openssl10.cnf
 
 %files devel
@@ -415,9 +415,18 @@ install -m 644 apps/openssl10.cnf $RPM_BUILD_ROOT%{_sysconfdir}/pki/openssl10.cn
 %attr(0644,root,root) %{_mandir}/man3*/*
 %attr(0644,root,root) %{_libdir}/pkgconfig/*.pc
 
-%ldconfig_scriptlets
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %changelog
+* Sat Apr 19 2026 Alexander Ursu <alexander.ursu@gmail.com> - 1:1.0.2o-12
+- Changed prefix to /usr/local/openssl10 to avoid conflicts with system OpenSSL
+- Removed Conflicts with openssl and openssl-devel
+- Added ld.so.conf.d config for custom libdir
+- Replaced %%ldconfig_scriptlets with explicit %%post/%%postun ldconfig calls
+- Removed %%dir ownership of /etc/pki
+- Aligned %%_openssldir with Configure --openssldir
+
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.2o-11
 - Second attempt - Rebuilt for
   https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
