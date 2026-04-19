@@ -15,7 +15,7 @@
 %global thread_test_threads %{?threads:%{threads}}%{!?threads:1}
 
 %define _prefix /usr/local/openssl10
-%define _openssldir %{_sysconfdir}/pki/tls
+%define _openssldir %{_prefix}/pki/tls
 
 # Arches on which we need to prevent arch conflicts on opensslconf.h, must
 # also be handled in opensslconf-new.h.
@@ -112,7 +112,6 @@ BuildRequires: /usr/bin/rename
 BuildRequires: /usr/bin/pod2man
 BuildRequires: perl(FileHandle)
 Requires: coreutils, make
-Requires: crypto-policies
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -211,8 +210,6 @@ perl util/perlpath.pl `dirname %{__perl}`
 touch Makefile
 make TABLE PERL=%{__perl}
 
-cp apps/openssl.cnf apps/openssl10.cnf
-
 %build
 # Figure out which flags we want to use.
 # default
@@ -278,8 +275,7 @@ sslarch=linux-generic64
 # usable on all platforms.  The Configure script already knows to use -fPIC and
 # RPM_OPT_FLAGS, so we can skip specifiying them here.
 ./Configure \
-    --prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls ${sslflags} \
-    --system-ciphers-file=%{_sysconfdir}/crypto-policies/back-ends/openssl.config \
+    --prefix=%{_prefix} --openssldir=%{_openssldir} ${sslflags} \
     zlib sctp enable-camellia enable-seed enable-tlsext enable-rfc3779 \
     enable-cms enable-md2 enable-rc5 \
     no-mdc2 no-ec2m no-gost no-srp no-krb5 \
@@ -312,8 +308,6 @@ done
 patch -p1 -R < %{PATCH33}
 
 sed -i 's/ test_cms//g' test/Makefile
-
-cp apps/openssl.cnf apps/openssl10.cnf
 
 LD_LIBRARY_PATH=`pwd`${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 export LD_LIBRARY_PATH
@@ -350,8 +344,8 @@ install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir},%{_li
 make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 make INSTALL_PREFIX=$RPM_BUILD_ROOT install_docs
 mv $RPM_BUILD_ROOT%{_libdir}/engines $RPM_BUILD_ROOT%{_libdir}/openssl
-mv $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/man/* $RPM_BUILD_ROOT%{_mandir}/
-rmdir $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/man
+mv $RPM_BUILD_ROOT%{_openssldir}/man/* $RPM_BUILD_ROOT%{_mandir}/
+rmdir $RPM_BUILD_ROOT%{_openssldir}/man
 rename so.%{soversion} so.%{version} $RPM_BUILD_ROOT%{_libdir}/*.so.%{soversion}
 for lib in $RPM_BUILD_ROOT%{_libdir}/*.so.%{version} ; do
     chmod 755 ${lib}
@@ -387,7 +381,7 @@ rm -rf $RPM_BUILD_ROOT/%{_bindir}
 rm -rf $RPM_BUILD_ROOT/%{_libdir}/openssl
 
 # Install compat config file
-install -m 644 apps/openssl10.cnf $RPM_BUILD_ROOT%{_sysconfdir}/pki/openssl10.cnf
+install -m 644 apps/openssl.cnf $RPM_BUILD_ROOT%{_openssldir}/openssl.cnf
 
 # Install ld.so.conf.d config so ldconfig can find our libs
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d
@@ -406,7 +400,7 @@ echo %{_libdir} > $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d/%{name}-%{_arch}.co
 %attr(0644,root,root) %{_libdir}/.libcrypto.so.*.hmac
 %attr(0644,root,root) %{_libdir}/.libssl.so.*.hmac
 %attr(0644,root,root) %{_sysconfdir}/ld.so.conf.d/%{name}-%{_arch}.conf
-%attr(0644,root,root) %{_sysconfdir}/pki/openssl10.cnf
+%attr(0644,root,root) %{_openssldir}/openssl.cnf
 
 %files devel
 %doc doc/c-indentation.el doc/openssl.txt CHANGES
