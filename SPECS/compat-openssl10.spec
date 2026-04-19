@@ -270,6 +270,14 @@ sslflags=enable-ec_nistp_64_gcc_128
 sslarch=linux-generic64
 %endif
 
+RPM_LD_FLAGS="$RPM_LD_FLAGS -Wl,-rpath=%{_libdir} -Wl,--enable-new-dtags"
+
+# Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
+# marked as not requiring an executable stack.
+# Also add -DPURIFY to make using valgrind with openssl easier as we do not
+# want to depend on the uninitialized memory as a source of entropy anyway.
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS"
+
 # ia64, x86_64, ppc are OK by default
 # Configure the build tree.  Override OpenSSL defaults with known-good defaults
 # usable on all platforms.  The Configure script already knows to use -fPIC and
@@ -280,13 +288,8 @@ sslarch=linux-generic64
     enable-cms enable-md2 enable-rc5 \
     no-mdc2 no-ec2m no-gost no-srp no-krb5 \
     --enginesdir=%{_libdir}/openssl/engines \
-    shared  ${sslarch} %{?!nofips:fips}
+    shared  ${sslarch} $RPM_OPT_FLAGS %{?!nofips:fips}
 
-# Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
-# marked as not requiring an executable stack.
-# Also add -DPURIFY to make using valgrind with openssl easier as we do not
-# want to depend on the uninitialized memory as a source of entropy anyway.
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY"
 make depend
 make all
 
@@ -343,7 +346,6 @@ make -C test apps tests
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir},%{_libdir}/openssl}
 make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 make INSTALL_PREFIX=$RPM_BUILD_ROOT install_docs
-mv $RPM_BUILD_ROOT%{_libdir}/engines $RPM_BUILD_ROOT%{_libdir}/openssl
 mv $RPM_BUILD_ROOT%{_openssldir}/man/* $RPM_BUILD_ROOT%{_mandir}/
 rmdir $RPM_BUILD_ROOT%{_openssldir}/man
 rename so.%{soversion} so.%{version} $RPM_BUILD_ROOT%{_libdir}/*.so.%{soversion}
