@@ -344,8 +344,8 @@ make -C test apps tests
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 # Install OpenSSL.
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir},%{_libdir}/openssl}
-make INSTALL_PREFIX=$RPM_BUILD_ROOT install
-make INSTALL_PREFIX=$RPM_BUILD_ROOT install_docs
+make INSTALL_PREFIX=$RPM_BUILD_ROOT LIBDIR=%{_lib} install
+make INSTALL_PREFIX=$RPM_BUILD_ROOT LIBDIR=%{_lib} install_docs
 mv $RPM_BUILD_ROOT%{_openssldir}/man/* $RPM_BUILD_ROOT%{_mandir}/
 rmdir $RPM_BUILD_ROOT%{_openssldir}/man
 # SHLIB_VERSION_NUMBER is patched to %{version}, so make install already
