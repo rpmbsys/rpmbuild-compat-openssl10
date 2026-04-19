@@ -419,7 +419,7 @@ echo %{_libdir} > $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d/%{name}-%{_arch}.co
 %postun -p /sbin/ldconfig
 
 %changelog
-* Sat Apr 19 2026 Alexander Ursu <alexander.ursu@gmail.com> - 1:1.0.2o-12
+* Fri Apr 17 2026 Alexander Ursu <alexander.ursu@gmail.com> - 1:1.0.2o-12
 - Changed prefix to /usr/local/openssl10 to avoid conflicts with system OpenSSL
 - Removed Conflicts with openssl and openssl-devel
 - Added ld.so.conf.d config for custom libdir
